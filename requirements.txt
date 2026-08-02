@@ -1,0 +1,8 @@
+requests
+psycopg2-binary
+python-dotenv
+beautifulsoup4
+fastapi
+uvicorn
+
+# Add any other libraries your fetchers use (e.g., beautifulsoup4, httpx)
