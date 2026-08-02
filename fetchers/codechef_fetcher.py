@@ -3,61 +3,69 @@ from bs4 import BeautifulSoup
 
 
 def fetch_codechef(username):
-
     url = f"https://www.codechef.com/users/{username}"
 
-    response = requests.get(url)
-
-    if response.status_code != 200:
-        return None
-
-    soup = BeautifulSoup(response.text, "html.parser")
-
-    rating = 0
-    highest = 0
-    stars = "N/A"
-    solved = 0
-
-    try:
-        rating = int(
-            soup.find("div", class_="rating-number").text.strip()
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/138.0.0.0 Safari/537.36"
         )
-    except:
-        pass
+    }
 
     try:
-        highest = int(
-            soup.find(
-                "small",
-                class_="rating"
-            ).text.split("Highest Rating")[1].strip()
-        )
-    except:
-        highest = rating
+        response = requests.get(url, headers=headers, timeout=15)
 
-    try:
-        stars = soup.find(
-            "span",
-            class_="rating"
-        ).text.strip()
-    except:
-        pass
+        print("Status Code:", response.status_code)
+        print("Final URL:", response.url)
 
-    try:
-        solved = int(
-            soup.find_all("h5")[0].text.split()[-1]
-        )
-    except:
+        if response.status_code != 200:
+            return None
+
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        rating = 0
+        highest = 0
+        stars = "N/A"
         solved = 0
 
-    return {
+        rating_div = soup.find("div", class_="rating-number")
+        if rating_div:
+            rating = int(rating_div.text.strip())
 
-        "rating": rating,
+        highest_small = soup.find("small", class_="rating")
+        if highest_small:
+            text = highest_small.get_text(" ", strip=True)
 
-        "highest_rating": highest,
+            import re
 
-        "stars": stars,
+            match = re.search(r"Highest Rating\s*([0-9]+)", text)
+            if match:
+                highest = int(match.group(1))
+            else:
+                highest = rating
+        else:
+            highest = rating
 
-        "total": solved
+        star_span = soup.find("span", class_="rating")
+        if star_span:
+            stars = star_span.text.strip()
 
-    }
+        h5s = soup.find_all("h5")
+        if h5s:
+            import re
+
+            nums = re.findall(r"\d+", h5s[0].text)
+            if nums:
+                solved = int(nums[-1])
+
+        return {
+            "rating": rating,
+            "highest_rating": highest,
+            "stars": stars,
+            "total": solved,
+        }
+
+    except Exception as e:
+        print("CodeChef Error:", e)
+        return None
