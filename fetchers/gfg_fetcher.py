@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 def fetch_gfg(username):
 
-    url = f"https://auth.geeksforgeeks.org/user/{username}"
+    url = f"https://auth.geeksforgeeks.org/profile/{username}"
 
     response = requests.get(url)
 
