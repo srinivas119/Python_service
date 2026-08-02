@@ -1,9 +1,8 @@
 import requests
-from bs4 import BeautifulSoup
 
 
 def fetch_gfg(username):
-    url = f"https://www.geeksforgeeks.org/profile/{username}"
+    url = f"https://www.geeksforgeeks.org/gfg-assets/_next/data/YOUR_BUILD_ID/profile/{username}.json?tab=activity"
 
     headers = {
         "User-Agent": "Mozilla/5.0"
@@ -12,21 +11,28 @@ def fetch_gfg(username):
     try:
         response = requests.get(url, headers=headers, timeout=15)
 
-        print("Status:", response.status_code)
-        print("URL:", response.url)
-
         if response.status_code != 200:
-            print(response.text[:500])
             return None
 
-        soup = BeautifulSoup(response.text, "html.parser")
+        data = response.json()
 
-        print("TITLE:", soup.title.string if soup.title else "No title")
+        result = data["result"]
+
+        basic = len(result.get("Basic", {}))
+        easy = len(result.get("Easy", {}))
+        medium = len(result.get("Medium", {}))
+        hard = len(result.get("Hard", {}))
+
+        total = data.get("count", basic + easy + medium + hard)
 
         return {
-            "score": 0
+            "score": total,
+            "total": total,
+            "easy": easy,
+            "medium": medium,
+            "hard": hard,
         }
 
     except Exception as e:
-        print("GFG ERROR:", e)
+        print("GFG Error:", e)
         return None
