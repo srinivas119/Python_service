@@ -3,35 +3,33 @@ from bs4 import BeautifulSoup
 
 
 def fetch_gfg(username):
+    url = f"https://www.geeksforgeeks.org/profile/{username}"
 
-    url = f"https://auth.geeksforgeeks.org/profile/{username}"
-
-    response = requests.get(url)
-
-    if response.status_code != 200:
-        return None
-
-    soup = BeautifulSoup(response.text, "html.parser")
-
-    score = 0
+    headers = {
+        "User-Agent": "Mozilla/5.0"
+    }
 
     try:
+        response = requests.get(url, headers=headers, timeout=15)
 
-        score = int(
+        print("Status:", response.status_code)
+        print("URL:", response.url)
 
-            soup.find(
-                "div",
-                class_="score_card_value"
-            ).text.strip()
+        if response.status_code != 200:
+            return None
 
-        )
+        # Save HTML for debugging
+        with open("gfg.html", "w", encoding="utf-8") as f:
+            f.write(response.text)
 
-    except:
+        soup = BeautifulSoup(response.text, "html.parser")
 
-        score = 0
+        print(soup.title)
 
-    return {
+        return {
+            "score": 0
+        }
 
-        "score": score
-
-    }
+    except Exception as e:
+        print("GFG Error:", e)
+        return None
