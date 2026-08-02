@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import re
 
 
 def fetch_codechef(username):
@@ -15,15 +16,11 @@ def fetch_codechef(username):
 
     try:
         response = requests.get(url, headers=headers, timeout=15)
-        response = requests.get(url, headers=headers, timeout=15)
 
-print("Status Code:", response.status_code)
-print("URL:", response.url)
-print("First 500 chars:")
-print(response.text[:500])
-        
         print("Status Code:", response.status_code)
         print("Final URL:", response.url)
+        print("First 500 chars:")
+        print(response.text[:500])
 
         if response.status_code != 200:
             return None
@@ -35,17 +32,20 @@ print(response.text[:500])
         stars = "N/A"
         solved = 0
 
+        # Rating
         rating_div = soup.find("div", class_="rating-number")
         if rating_div:
-            rating = int(rating_div.text.strip())
+            try:
+                rating = int(rating_div.text.strip())
+            except:
+                pass
 
+        # Highest Rating
         highest_small = soup.find("small", class_="rating")
         if highest_small:
             text = highest_small.get_text(" ", strip=True)
-
-            import re
-
             match = re.search(r"Highest Rating\s*([0-9]+)", text)
+
             if match:
                 highest = int(match.group(1))
             else:
@@ -53,17 +53,25 @@ print(response.text[:500])
         else:
             highest = rating
 
+        # Stars
         star_span = soup.find("span", class_="rating")
         if star_span:
             stars = star_span.text.strip()
 
-        h5s = soup.find_all("h5")
-        if h5s:
-            import re
+        # Total Problems Solved
+        page_text = soup.get_text(" ", strip=True)
 
-            nums = re.findall(r"\d+", h5s[0].text)
-            if nums:
-                solved = int(nums[-1])
+        match = re.search(
+            r"Total\s+Problems\s+Solved\s*:\s*(\d+)",
+            page_text,
+            re.IGNORECASE,
+        )
+
+        if match:
+            solved = int(match.group(1))
+        else:
+            print("❌ Could not find 'Total Problems Solved' in HTML")
+            solved = 0
 
         return {
             "rating": rating,
@@ -73,5 +81,5 @@ print(response.text[:500])
         }
 
     except Exception as e:
-        print("CodeChef Error:", e)
+        print("❌ CodeChef Error:", e)
         return None
