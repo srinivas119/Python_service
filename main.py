@@ -2,21 +2,21 @@ from fastapi import FastAPI, HTTPException
 import asyncio
 
 # Import your existing service modules
-from services.codechef_service import fetch_codechef_data
-from services.codeforces_service import fetch_codeforces_data
-from services.gfg_service import fetch_gfg_data
-from services.github_service import fetch_github_data
-from services.leetcode_service import fetch_leetcode_data
+from services.codechef_service import fetch_codechef
+from services.codeforces_service import fetch_codeforces
+from services.gfg_service import fetch_gfg
+from services.github_service import fetch_github
+from services.leetcode_service import fetch_leetcode
 
 app = FastAPI(title="UnifyCode Python Data Fetcher Service")
 
 # Map platform strings to service handlers
 SERVICES = {
-    "codechef": fetch_codechef_data,
-    "codeforces": fetch_codeforces_data,
-    "gfg": fetch_gfg_data,
-    "github": fetch_github_data,
-    "leetcode": fetch_leetcode_data,
+    "codechef": fetch_codechef,
+    "codeforces": fetch_codeforces,
+    "gfg": fetch_gfg,
+    "github": fetch_github,
+    "leetcode": fetch_leetcode,
 }
 
 @app.get("/")
