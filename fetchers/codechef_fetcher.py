@@ -15,7 +15,13 @@ def fetch_codechef(username):
 
     try:
         response = requests.get(url, headers=headers, timeout=15)
+        response = requests.get(url, headers=headers, timeout=15)
 
+print("Status Code:", response.status_code)
+print("URL:", response.url)
+print("First 500 chars:")
+print(response.text[:500])
+        
         print("Status Code:", response.status_code)
         print("Final URL:", response.url)
 
