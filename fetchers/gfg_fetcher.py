@@ -16,20 +16,17 @@ def fetch_gfg(username):
         print("URL:", response.url)
 
         if response.status_code != 200:
+            print(response.text[:500])
             return None
-
-        # Save HTML for debugging
-        with open("gfg.html", "w", encoding="utf-8") as f:
-            f.write(response.text)
 
         soup = BeautifulSoup(response.text, "html.parser")
 
-        print(soup.title)
+        print("TITLE:", soup.title.string if soup.title else "No title")
 
         return {
             "score": 0
         }
 
     except Exception as e:
-        print("GFG Error:", e)
+        print("GFG ERROR:", e)
         return None
