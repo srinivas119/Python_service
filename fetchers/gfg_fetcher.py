@@ -1,22 +1,33 @@
 import requests
 
+HEADERS = {
+    "User-Agent": "Mozilla/5.0",
+    "Accept": "application/json",
+}
 
 def fetch_gfg(username):
-    url = f"https://www.geeksforgeeks.org/gfg-assets/_next/data/YOUR_BUILD_ID/profile/{username}.json?tab=activity"
+    url = "https://practiceapi.geeksforgeeks.org/api/v1/user/problems/submissions/"
 
-    headers = {
-        "User-Agent": "Mozilla/5.0"
+    params = {
+        "handle": username
     }
 
     try:
-        response = requests.get(url, headers=headers, timeout=15)
+        response = requests.get(
+            url,
+            params=params,
+            headers=HEADERS,
+            timeout=20,
+        )
 
-        if response.status_code != 200:
-            return None
+        response.raise_for_status()
 
         data = response.json()
 
-        result = data["result"]
+        if data.get("status") != "success":
+            return None
+
+        result = data.get("result", {})
 
         basic = len(result.get("Basic", {}))
         easy = len(result.get("Easy", {}))
@@ -28,6 +39,7 @@ def fetch_gfg(username):
         return {
             "score": total,
             "total": total,
+            "basic": basic,
             "easy": easy,
             "medium": medium,
             "hard": hard,
@@ -36,3 +48,7 @@ def fetch_gfg(username):
     except Exception as e:
         print("GFG Error:", e)
         return None
+
+
+if __name__ == "__main__":
+    print(fetch_gfg("srinivas119"))
