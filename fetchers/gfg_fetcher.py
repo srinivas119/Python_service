@@ -3,20 +3,24 @@ import requests
 HEADERS = {
     "User-Agent": "Mozilla/5.0",
     "Accept": "application/json",
+    "Content-Type": "application/json",
 }
 
 
 def fetch_gfg(username):
     url = "https://practiceapi.geeksforgeeks.org/api/v1/user/problems/submissions/"
 
-    params = {
-        "handle": username
+    payload = {
+        "handle": username,
+        "requestType": "",
+        "month": "",
+        "year": ""
     }
 
     try:
-        response = requests.get(
+        response = requests.post(
             url,
-            params=params,
+            json=payload,
             headers=HEADERS,
             timeout=20,
         )
@@ -27,8 +31,6 @@ def fetch_gfg(username):
         response.raise_for_status()
 
         data = response.json()
-
-        print("JSON:", data)
 
         if data.get("status") != "success":
             return None
