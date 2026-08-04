@@ -15,8 +15,7 @@ def update_codechef(user_id, username):
     conn = get_connection()
 
     cur = conn.cursor()
-
-   cur.execute(
+    cur.execute(
     """
     INSERT INTO coding_profiles
     (
