@@ -27,8 +27,12 @@ def fetch_codeforces(username):
 
         for sub in submissions:
             if sub.get("verdict") == "OK":
-                problem = sub["problem"]
-                solved.add(f'{problem["contestId"]}-{problem["index"]}')
+                problem = sub.get("problem", {})
+                contest_id = problem.get("contestId")
+                index = problem.get("index")
+
+                if contest_id and index:
+                    solved.add(f"{contest_id}-{index}")
 
             if "contestId" in sub:
                 contests.add(sub["contestId"])
