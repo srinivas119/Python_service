@@ -2,9 +2,7 @@ import requests
 
 
 def fetch_codeforces(username):
-
     url = f"https://codeforces.com/api/user.info?handles={username}"
-
     response = requests.get(url)
 
     if response.status_code != 200:
@@ -17,43 +15,28 @@ def fetch_codeforces(username):
 
     user = result["result"][0]
 
-    # Fetch user submissions
+    # Fetch user submissions to calculate total unique problems solved and contests
     status_url = f"https://codeforces.com/api/user.status?handle={username}"
-
     status_response = requests.get(status_url)
 
     solved = set()
-
     contests = set()
 
     if status_response.status_code == 200:
-
         submissions = status_response.json()["result"]
 
         for sub in submissions:
-
             if sub.get("verdict") == "OK":
-
                 problem = sub["problem"]
-
-                solved.add(
-                    f'{problem["contestId"]}-{problem["index"]}'
-                )
+                solved.add(f'{problem["contestId"]}-{problem["index"]}')
 
             if "contestId" in sub:
-
                 contests.add(sub["contestId"])
 
     return {
-
-        "rating": user.get("rating", 0),
-
-        "max_rating": user.get("maxRating", 0),
-
-        "rank": user.get("rank", "Unrated"),
-
         "total": len(solved),
-
-        "contests": len(contests)
-
+        "rating": user.get("rating", 0),
+        "max_rating": user.get("maxRating", 0),
+        "rank": user.get("rank", "Unrated"),
+        "contests": len(contests),
     }
